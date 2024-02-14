@@ -16,16 +16,22 @@ var cors = require('cors')
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  context: authMiddleware
-})
+});
 
 const startApolloServer = async () => {
   await server.start();
   
-  app.use(cors());
+  app.use(cors({
+    origin: 'http://localhost:3000',
+    credentials: true
+  }));
 
   app.use(express.urlencoded({ extended: false }));
   app.use(express.json());
+
+  app.use('/graphql', expressMiddleware(server, {
+    context: authMiddleware
+  }));
 
   if (process.env.NODE_ENV === 'production') {
     app.use(express.static(path.join(__dirname, '../client/dist')));

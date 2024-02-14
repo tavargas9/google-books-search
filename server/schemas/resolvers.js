@@ -9,6 +9,14 @@ const resolvers = {
         
         user: async (parent, { username }) => {
             return User.findOne({ username }).populate('savedBooks');
+        },
+        me: async (parent, args, context) => {
+            if (context.user) {
+                const user = await User.findOne({ _id: context.user._id }).populate('savedBooks');
+                return user;
+            }
+
+            throw AuthenticationError;
         }
     },
     Mutation: {
@@ -36,12 +44,13 @@ const resolvers = {
         },
         addBook: async (parent, { input }, context) => {
             if (context.user) {
-                const updatedUser = await User.findOneAndUpdate(
+                const updatedUser = await User.findByIdAndUpdate(
                     { _id: context.user._id },
                     { $addToSet: { savedBooks: input } },
                     { new: true }
-                )
-                return updatedUser;
+                );
+
+            return updatedUser;
             }
             throw AuthenticationError;
         },
