@@ -11,6 +11,8 @@ const { authMiddleware } = require('./utils/auth');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+var cors = require('cors')
+
 const server = new ApolloServer({
   typeDefs,
   resolvers,
@@ -19,6 +21,8 @@ const server = new ApolloServer({
 
 const startApolloServer = async () => {
   await server.start();
+  
+  app.use(cors());
 
   app.use(express.urlencoded({ extended: false }));
   app.use(express.json());
